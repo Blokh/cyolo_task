@@ -12,9 +12,12 @@ export const env = createEnv({
     PORT: z.coerce.number().default(3000),
 
     DATABASE_URL: z.string().url(),
+
     REDIS_HOST: z.string().default('127.0.0.1'),
     REDIS_PORT: z.coerce.number().int().nonnegative().default(6379),
     REDIS_DB: z.coerce.number().int().nonnegative().default(0),
+
+    DISK_FILE_NAME: z.string().optional().default('cyolo_uploads'),
   },
   client: {},
   runtimeEnv: process.env,

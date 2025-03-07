@@ -19,7 +19,8 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@/*": ["src/*"],
-      "@/env": ["src/env.ts"]
+      "@/env": ["env.ts"]
     }
-  }
+  },
+  "extends": "../../tsconfig.json"
 }
