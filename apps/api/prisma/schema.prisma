@@ -14,10 +14,11 @@ datasource db {
 }
 
 model ImageFile {
-  id         String  @id @default(cuid())
-  filePath   String  @unique
-  userId     String
-  isArchived Boolean
+  id               String  @id @default(cuid())
+  filePath         String  @unique
+  userId           String
+  originalFileName String
+  isArchived       Boolean @default(false)
 
   @@index([filePath, userId, isArchived])
   @@index([isArchived, filePath])
