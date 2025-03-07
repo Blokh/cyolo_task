@@ -8,6 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "biome format --write .",
+    "prepare": "bash ./scripts/prepare.sh",
     "lint": "biome lint .",
     "check": "biome check --apply .",
     "start": "nest start",
