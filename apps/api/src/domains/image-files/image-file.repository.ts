@@ -44,7 +44,7 @@ export class ImageFileRepository {
   }
 
   async setAsArchived(fileId: string) {
-    this.prisma.imageFile.update({
+    return await this.prisma.imageFile.update({
       where: { id: fileId },
       data: { isArchived: true },
     });
