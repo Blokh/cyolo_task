@@ -6,14 +6,21 @@ import * as path from "node:path";
 import { env } from "@/env";
 import * as os from "node:os";
 import { ImageFileRepository } from "@/domains/image-files/image-file.repository";
+import { DeleteFileServiceWorker } from "@/utils/bull-mq/workers/delete-file-service-worker.service";
+import {PrismaService} from "@/utils/prisma/prisma.service";
+
+const DEFAULT_RETENTION_TIME_IN_SECONDS = 60
 
 @Injectable()
 export class ImageFileService {
   private folderPath: string;
   private client: typeof fs;
 
-
-  constructor(private readonly imageFileRepository: ImageFileRepository) {
+  constructor(
+    private readonly imageFileRepository: ImageFileRepository,
+    private readonly prismaService: PrismaService,
+    private readonly deleteFileServiceWorker: DeleteFileServiceWorker,
+  ) {
     const folderName = env.DISK_FILE_NAME;
     this.folderPath = path.join(os.homedir(), folderName);
     this.client = fs;
@@ -33,16 +40,22 @@ export class ImageFileService {
       mimeType: file.mimetype,
     });
 
-    const savedFilePath = await this.uploadFileUsingStream(file, filePath);
+    const [savedFilePath, imageFile] = await this.prismaService.$transaction( async (transaction) => {
+      return await Promise.all([
+        this.uploadFileUsingStream(file, filePath),
+        this.imageFileRepository.create({
+          id: fileId,
+          filePath: filePath,
+          userId,
+          originalFileName: file.originalname,
+        }, transaction)
+      ])
+    })
 
-    const imageFile = this.imageFileRepository.create({
-      id: fileId,
-      filePath: savedFilePath,
-      userId,
-      originalFileName: file.originalname,
-    });
+    await this.deleteFileServiceWorker.addJob({fileId: imageFile.id}, {
+      delay: (retentionTimeInSeconds ?? DEFAULT_RETENTION_TIME_IN_SECONDS) * 1000,
+    })
 
-    // TODO in invoke job to delete after delay
     return imageFile;
   }
 
@@ -50,7 +63,7 @@ export class ImageFileService {
     const file = await this.imageFileRepository.findFileByPath(filePath); // this throws not found in case it's archived
     const fileStream = this.client.createReadStream(filePath);
 
-    return {fileStream: fileStream, originalFileName: file.originalFileName};
+    return { fileStream: fileStream, originalFileName: file.originalFileName };
   }
 
   public async deleteImageFile(fileId: string) {
@@ -69,7 +82,9 @@ export class ImageFileService {
 
   private async ensureDirectoryExists(userId: string) {
     try {
-      return fs.mkdirSync(path.join(this.folderPath, userId), { recursive: true });
+      return fs.mkdirSync(path.join(this.folderPath, userId), {
+        recursive: true,
+      });
     } catch (error) {
       if (error.code !== "EEXIST") {
         throw error;

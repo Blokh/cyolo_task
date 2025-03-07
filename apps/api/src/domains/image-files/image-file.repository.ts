@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@/utils/prisma/prisma.service';
-import type { Prisma } from '@prisma/client';
+import {Prisma, PrismaClient} from "@prisma/client";
+import {PrismaTransaction} from "@/utils/prisma/types";
 
 @Injectable()
 export class ImageFileRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createImageArgs: Prisma.ImageFileCreateArgs['data']) {
-    return await this.prisma.imageFile.create({
+  async create(createImageArgs: Prisma.ImageFileCreateArgs['data'], transaction: PrismaTransaction | PrismaClient = this.prisma) {
+    return await transaction.imageFile.create({
       data: createImageArgs,
     });
   }

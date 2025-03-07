@@ -6,7 +6,7 @@ export class CreateImageFileDto {
   @IsInt()
   @Min(60, { message: 'Retention time must be at least 60 seconds' })
   @Type(() => Number)
-  retentionTimeInSeconds?: number = 60;
+  retentionTimeInSeconds?: number;
 
   file: Express.Multer.File;
 }
