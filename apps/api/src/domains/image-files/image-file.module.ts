@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from '@/utils/prisma/prisma.service';
 import { ImageFileRepository } from '@/domains/image-files/image-file.repository';
+import { ImageFileService } from '@/domains/image-files/image-file.service';
+import { PrismaModule } from '@/utils/prisma/prisma.module';
 
 @Module({
-  imports: [PrismaService],
-  providers: [PrismaService, ImageFileRepository],
-  exports: [PrismaService],
+  imports: [PrismaModule],
+  providers: [ImageFileService, ImageFileRepository],
+  exports: [ImageFileService],
 })
 export class ImageFileModule {}

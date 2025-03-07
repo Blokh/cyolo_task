@@ -7,6 +7,8 @@
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,

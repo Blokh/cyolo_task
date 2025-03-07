@@ -1,29 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import type { ImageFileRepository } from '@/domains/image-files/image-file.repository';
-import { generateId } from '@/utils/helpers/generate-id/generate-id';
-import { createWriteStream } from 'node:fs';
-import * as mime from 'mime-types';
-import path from 'node:path';
-import { env } from '@/env';
-import os from 'node:os';
-import * as fs from 'node:fs';
+import { Injectable } from "@nestjs/common";
+import { generateId } from "@/utils/helpers/generate-id/generate-id";
+import * as fs from "node:fs";
+import * as mime from "mime-types";
+import * as path from "node:path";
+import { env } from "@/env";
+import * as os from "node:os";
+import { ImageFileRepository } from "@/domains/image-files/image-file.repository";
 
 @Injectable()
 export class ImageFileService {
-  folderPath: string;
+  private folderPath: string;
+  private client: typeof fs;
+
 
   constructor(private readonly imageFileRepository: ImageFileRepository) {
     const folderName = env.DISK_FILE_NAME;
     this.folderPath = path.join(os.homedir(), folderName);
+    this.client = fs;
   }
 
   public async createImageFile(
     userId: string,
     file: Express.Multer.File,
-    retentionTimeInSeconds?: 60,
+    retentionTimeInSeconds?: number,
   ) {
     const fileId = generateId();
-    await this.ensureDirectoryExists();
+    await this.ensureDirectoryExists(userId);
 
     const filePath = this.composeFilePath({
       userId,
@@ -44,6 +46,13 @@ export class ImageFileService {
     return imageFile;
   }
 
+  public async getFileContentStream(filePath: string) {
+    const file = await this.imageFileRepository.findFileByPath(filePath); // this throws not found in case it's archived
+    const fileStream = this.client.createReadStream(filePath);
+
+    return {fileStream: fileStream, originalFileName: file.originalFileName};
+  }
+
   public async deleteImageFile(fileId: string) {
     const file = await this.imageFileRepository.findFile(fileId);
 
@@ -58,11 +67,11 @@ export class ImageFileService {
     return await this.imageFileRepository.setAsArchived(file.id);
   }
 
-  private async ensureDirectoryExists() {
+  private async ensureDirectoryExists(userId: string) {
     try {
-      return fs.mkdirSync(this.folderPath, { recursive: true });
+      return fs.mkdirSync(path.join(this.folderPath, userId), { recursive: true });
     } catch (error) {
-      if (error.code !== 'EEXIST') {
+      if (error.code !== "EEXIST") {
         throw error;
       }
     }
@@ -77,20 +86,23 @@ export class ImageFileService {
     fileId: string;
     mimeType: string;
   }) {
-    const extension = mime.extension(mimeType) || '';
-    const fileName = `${fileId}${extension ? `.${extension}` : ''}`;
+    const extension = mime.extension(mimeType) || "";
+    const fileName = `${fileId}${extension ? `.${extension}` : ""}`;
     const filePath = path.join(this.folderPath, userId, fileName);
 
     return filePath;
   }
 
-  private async uploadFileUsingStream(file: Express.Multer.File, filePath: string) {
-    const writeStream = createWriteStream(filePath);
+  private async uploadFileUsingStream(
+    file: Express.Multer.File,
+    filePath: string,
+  ) {
+    const writeStream = this.client.createWriteStream(filePath);
 
     return new Promise<string>((resolve, reject) => {
       writeStream.write(file.buffer);
-      writeStream.on('finish', () => resolve(filePath));
-      writeStream.on('error', (error) => reject(error));
+      writeStream.on("finish", () => resolve(filePath));
+      writeStream.on("error", (error) => reject(error));
       writeStream.end();
     });
   }

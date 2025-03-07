@@ -3,6 +3,9 @@
   "organizeImports": {
     "enabled": true
   },
+  "typescript": {
+    "preferImportType": false
+  },
   "linter": {
     "enabled": true,
     "rules": {
