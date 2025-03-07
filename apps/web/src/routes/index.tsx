@@ -1,39 +1,37 @@
-import { createFileRoute } from '@tanstack/react-router'
+import {createFileRoute, Link} from '@tanstack/react-router'
 import logo from '../logo.svg'
 
 export const Route = createFileRoute('/')({
-  component: App,
+  component: HomePage,
 })
 
-function App() {
+function HomePage() {
+  // This could be loaded from an API or state management
+  const images = [
+    { id: 1, src: logo, alt: 'Image 1' },
+    { id: 2, src: logo, alt: 'Image 2' },
+    { id: 3, src: logo, alt: 'Image 3' },
+  ]
+
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/routes/index.tsx</code> and save to reload.
-        </p>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Image Gallery</h1>
+
+        <Link
+            to="/upload"
+            className="inline-block mb-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
-    </div>
+          Upload New Image
+        </Link>
+
+        {/* Image gallery */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {images.map(image => (
+              <div key={image.id} className="border rounded p-4">
+                <img src={image.src} alt={image.alt} className="w-full h-auto" />
+              </div>
+          ))}
+        </div>
+      </div>
   )
 }
