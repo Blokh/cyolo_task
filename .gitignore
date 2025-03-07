@@ -1,11 +1,11 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring image-files.
 
 # Dependencies
 node_modules
 .pnp
 .pnp.js
 
-# Local env files
+# Local env image-files
 **.env
 .env
 .env.local
