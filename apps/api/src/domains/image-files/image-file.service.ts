@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { generateId } from "@/utils/helpers/generate-id/generate-id";
 import * as fs from "node:fs";
-import { createWriteStream } from "node:fs";
 import * as mime from "mime-types";
 import * as path from "node:path";
 import { env } from "@/env";
@@ -10,11 +9,14 @@ import { ImageFileRepository } from "@/domains/image-files/image-file.repository
 
 @Injectable()
 export class ImageFileService {
-  folderPath: string;
+  private folderPath: string;
+  private client: typeof fs;
+
 
   constructor(private readonly imageFileRepository: ImageFileRepository) {
     const folderName = env.DISK_FILE_NAME;
     this.folderPath = path.join(os.homedir(), folderName);
+    this.client = fs;
   }
 
   public async createImageFile(
@@ -42,6 +44,13 @@ export class ImageFileService {
 
     // TODO in invoke job to delete after delay
     return imageFile;
+  }
+
+  public async getFileContentStream(filePath: string) {
+    const file = await this.imageFileRepository.findFileByPath(filePath); // this throws not found in case it's archived
+    const fileStream = this.client.createReadStream(filePath);
+
+    return {fileStream: fileStream, originalFileName: file.originalFileName};
   }
 
   public async deleteImageFile(fileId: string) {
@@ -88,7 +97,7 @@ export class ImageFileService {
     file: Express.Multer.File,
     filePath: string,
   ) {
-    const writeStream = createWriteStream(filePath);
+    const writeStream = this.client.createWriteStream(filePath);
 
     return new Promise<string>((resolve, reject) => {
       writeStream.write(file.buffer);

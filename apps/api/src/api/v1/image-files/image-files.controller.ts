@@ -1,11 +1,13 @@
 import {
   Body,
-  Controller,
-  Put,
+  Controller, Get, Header,
+  Param,
+  Put, Res, StreamableFile,
   UploadedFile,
   UseInterceptors,
 } from "@nestjs/common";
 import { ImageFileService } from "@/domains/image-files/image-file.service";
+import { Response } from 'express';
 import { CustomFileValidatorInterceptor } from "@/utils/interceptors/image-validation.interceptor";
 import type { CreateImageFileDto } from "@cyolo/common";
 import { ApiTags } from "@nestjs/swagger";
@@ -28,5 +30,19 @@ export class ImageFilesController_V1 {
       file,
       createImageFileDto.retentionTimeInSeconds,
     );
+  }
+
+  @Get('/:pathUrl')
+  async getFileContent(
+  @Param('pathUrl') pathUrl: string,
+  @Res({ passthrough: true }) res: Response,
+  ) {
+    const { fileStream, originalFileName } =
+      await this.imageFileService.getFileContentStream(pathUrl);
+    
+    res.set('Content-Type', 'image/png');
+    res.set('Content-Disposition', `attachment; filename="${originalFileName}"`);
+    
+    return new StreamableFile(fileStream);
   }
 }
