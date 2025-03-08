@@ -15,6 +15,9 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "test:e2e": {
+      "dependsOn": ["^test:e2e"]
+    },
     "prepare": {},
     "check-types": {
       "dependsOn": ["^check-types"]

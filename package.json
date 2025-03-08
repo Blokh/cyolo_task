@@ -5,6 +5,7 @@
     "prepare": "turbo run prepare",
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "test:e2e": "turbo run test:e2e",
     "format": "turbo run format",
     "lint": "turbo run lint",
     "check": "turbo run check"
