@@ -33,7 +33,7 @@ The image preview has rendering issues. Initially attempted using stream but was
 2. Redis
 3. PostgreSQL
 4. NestJS
-5. React + Tanstack Router (first time) + Redux Toolkit (considered xstate/store but glad I didn't)
+5. React + Tanstack Router (first time) + Redux Toolkit (second time)(considered xstate/store but glad I didn't)
 6. Biome (first time)
 7. Shadcn and Tailwind
 
