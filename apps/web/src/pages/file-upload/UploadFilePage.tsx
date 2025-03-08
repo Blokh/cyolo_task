@@ -33,14 +33,14 @@ export default function UploadPage() {
     onSuccess: (response) => {
       if (response.filePath) {
         console.log("Calling openPreview with:", response.filePath);
-        imagePreview.openPreview(response.filePath);
+        imagePreviewHooks.openPreview(response.filePath);
       } else {
         console.error("No filePath in response");
       }
       },
   });
 
-  const imagePreview = useImagePreview();
+  const imagePreviewHooks = useImagePreview();
 
   const handleFileChange = (newFile: File) => {
     setFileError(null);
@@ -92,7 +92,7 @@ export default function UploadPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="retention-time">
-                    Retention Time (minutes){" "}
+                    Retention Time (Seconds){" "}
                     <span className="text-xs text-gray-500">(Optional)</span>
                   </Label>
                   <Input
@@ -152,7 +152,7 @@ export default function UploadPage() {
                         type="button"
                         variant="outline"
                         className="w-full"
-                        onClick={() => imagePreview.openPreview(data.filePath)}
+                        onClick={() => imagePreviewHooks.openPreview(data.filePath)}
                     >
                   <span className="flex items-center gap-2">
                     <Image className="h-5 w-5" />
@@ -166,12 +166,12 @@ export default function UploadPage() {
         </div>
 
         <ImagePreviewDialog
-            isOpen={imagePreview.isOpen}
-            onClose={imagePreview.closePreview}
-            imageUrl={imagePreview.imageUrl}
-            objectUrl={imagePreview.objectUrl}
-            isLoading={imagePreview.isLoading}
-            isError={imagePreview.isError}
+            isOpen={imagePreviewHooks.isOpen}
+            onClose={imagePreviewHooks.closePreview}
+            imageUrl={imagePreviewHooks.imageUrl}
+            objectUrl={imagePreviewHooks.objectUrl}
+            isLoading={imagePreviewHooks.isLoading}
+            isError={imagePreviewHooks.isError}
         />
       </div>
   );

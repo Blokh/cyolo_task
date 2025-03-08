@@ -7,21 +7,35 @@ export interface UseImagePreviewOptions {
 
 export function useImagePreview(options?: UseImagePreviewOptions) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [filePath, setFilePath] = useState<string | null>(null);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
 
   const {
     data: imageBlob,
     isLoading,
-    isError
-  } = useFindFileByPathQuery(imageUrl || '', {
-    skip: !imageUrl,
+    isError,
+    refetch
+  } = useFindFileByPathQuery(filePath || '', {
+    skip: !filePath,
   });
 
+  useEffect(() => {
+    if (isError) {
+      console.error('Error loading image from URL:', filePath);
+    }
+    if (filePath) {
+      console.log('Attempting to load image from:', filePath);
+    }
+  }, [filePath, isError]);
+
   const openPreview = (fileUrl: string) => {
-    console.log("openPreview called with:", fileUrl);
-    setImageUrl(fileUrl);
+    setFilePath(fileUrl);
     setIsOpen(true);
+
+    if (objectUrl) {
+      URL.revokeObjectURL(objectUrl);
+      setObjectUrl(null);
+    }
   };
 
   const closePreview = () => {
@@ -48,13 +62,19 @@ export function useImagePreview(options?: UseImagePreviewOptions) {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, []);
+  }, [objectUrl]);
+
+  useEffect(() => {
+    if (isOpen && filePath) {
+      refetch();
+    }
+  }, [isOpen, filePath, refetch]);
 
   return {
     isOpen,
     isLoading,
     isError,
-    imageUrl,
+    imageUrl: filePath,
     imageBlob,
     objectUrl,
     openPreview,

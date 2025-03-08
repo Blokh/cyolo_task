@@ -31,7 +31,12 @@ export function ImagePreviewDialog({
     if (objectUrl) {
       const a = document.createElement("a");
       a.href = objectUrl;
-      a.download = imageUrl?.split("/").pop() || "downloaded-image";
+
+      const filename = imageUrl
+        ? imageUrl.split("/").pop() || "downloaded-image"
+        : "downloaded-image";
+
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -40,11 +45,18 @@ export function ImagePreviewDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent
+        className="max-w-3xl"
+        aria-describedby="image-preview-description"
+      >
         <DialogHeader>
           <DialogTitle>Image Preview</DialogTitle>
           <DialogClose asChild></DialogClose>
         </DialogHeader>
+
+        <div id="image-preview-description" className="sr-only">
+          Preview of the uploaded image
+        </div>
 
         <div className="flex flex-col items-center space-y-4">
           {isLoading && (
@@ -57,6 +69,7 @@ export function ImagePreviewDialog({
           {isError && (
             <div className="flex flex-col items-center justify-center h-64 w-full">
               <p className="text-red-500">Failed to load image</p>
+              <p className="text-sm text-gray-500 mt-2">Path: {imageUrl}</p>
             </div>
           )}
 
