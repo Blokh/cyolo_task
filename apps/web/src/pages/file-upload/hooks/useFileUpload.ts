@@ -1,4 +1,3 @@
-// src/hooks/useFileUpload.ts
 import { useState } from 'react';
 import { useUploadFileMutation, type FileResponse } from '@/api/fileEndpoints';
 import { toast } from 'sonner';
@@ -7,13 +6,33 @@ export interface UseFileUploadOptions {
     onSuccess?: (response: FileResponse) => void;
 }
 
-export function useFileUpload(options?: UseFileUploadOptions) {
+export const useFileUpload = (options?: UseFileUploadOptions) => {
     const [file, setFile] = useState<File | null>(null);
-    const [retentionTimeMinutes, setRetentionTimeMinutes] = useState<number>(60); // Default 60 minutes
+    const [fileError, setFileError] = useState<string | null>(null);
+    const [retentionTimeMinutes, setRetentionTimeMinutes] = useState<number>(60);
     const [uploadFile, { isLoading, isSuccess, isError, error, data }] = useUploadFileMutation();
 
-    const handleFileChange = (files: File[]) => {
-        setFile(files.length > 0 ? files[0] : null);
+    const validateImageFile = (file: File): boolean => {
+        if (!file.type.startsWith('image/')) {
+            setFileError('Only image files are allowed');
+            return false;
+        }
+        setFileError(null);
+        return true;
+    };
+
+    const handleFileChange = (newFile: File | null) => {
+        if (!newFile) {
+            setFile(null);
+            setFileError(null);
+            return;
+        }
+
+        if (validateImageFile(newFile)) {
+            setFile(newFile);
+        } else {
+            setFile(null);
+        }
     };
 
     const handleRetentionTimeChange = (value: number) => {
@@ -28,18 +47,18 @@ export function useFileUpload(options?: UseFileUploadOptions) {
 
         try {
             const retentionTimeInSeconds = retentionTimeMinutes ? retentionTimeMinutes * 60 : undefined;
-
             const result = await uploadFile({
                 file,
                 retentionTimeInSeconds
             }).unwrap();
 
-            toast.success("File uploaded successfully!");
+            toast.success("Image uploaded successfully!");
             setFile(null);
 
             if (options?.onSuccess) {
                 options.onSuccess(result);
             }
+
 
             return result;
         } catch (err) {
@@ -51,6 +70,7 @@ export function useFileUpload(options?: UseFileUploadOptions) {
 
     return {
         file,
+        fileError,
         retentionTimeMinutes,
         isLoading,
         isSuccess,
@@ -59,7 +79,6 @@ export function useFileUpload(options?: UseFileUploadOptions) {
         data,
         handleFileChange,
         handleRetentionTimeChange,
-        handleUpload,
-        setFile
+        handleUpload
     };
-}
+};

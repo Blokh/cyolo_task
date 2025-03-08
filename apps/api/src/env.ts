@@ -5,7 +5,7 @@ config({ path: ".env" });
 const EnvSchema = z
   .object({
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
-    NODE_ENV: z.enum(["development", "sandbox", "production", "test", "local"]),
+    NODE_ENV: z.enum(["development", "sandbox", "production", "test", "local"]).default("local"),
 
     PORT: z.coerce.number().default(3000),
 

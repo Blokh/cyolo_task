@@ -5,7 +5,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { env } from '@/env';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+      bufferLogs: true,
+      snapshot: true,
+      cors: env.NODE_ENV === 'local',
+  });
   app.setGlobalPrefix('api');
   initSwagger(app);
 

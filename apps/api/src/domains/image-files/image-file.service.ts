@@ -8,6 +8,7 @@ import * as os from "node:os";
 import { ImageFileRepository } from "@/domains/image-files/image-file.repository";
 import { DeleteFileServiceWorker } from "@/utils/bull-mq/workers/delete-file-service-worker.service";
 import {PrismaService} from "@/utils/prisma/prisma.service";
+import {promisify} from "node:util";
 
 const DEFAULT_RETENTION_TIME_IN_SECONDS = 60
 
@@ -61,9 +62,10 @@ export class ImageFileService {
 
   public async getFileContentStream(filePath: string) {
     const file = await this.imageFileRepository.findFileByPath(filePath); // this throws not found in case it's archived
-    const fileStream = this.client.createReadStream(filePath);
+    const readFile = promisify(this.client.readFile);
+    const fileBuffer = await readFile(filePath);
 
-    return { fileStream: fileStream, originalFileName: file.originalFileName };
+    return { fileBuffer: fileBuffer, originalFileName: file.originalFileName, path };
   }
 
   public async deleteImageFile(fileId: string) {

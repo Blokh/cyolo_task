@@ -13,6 +13,7 @@ const FileResponseSchema = z.object({
   originalFileName: z.string(),
   isArchived: z.boolean(),
 });
+
 export type FileResponse = z.infer<typeof FileResponseSchema>;
 
 export const fileEndpoints = api.injectEndpoints({
@@ -30,11 +31,14 @@ export const fileEndpoints = api.injectEndpoints({
         }
 
         return {
-          url: "files/upload",
-          method: "POST",
-          body: formData,
-          responseHandler: (response: unknown) => {
-            return FileResponseSchema.parse(response);
+          url: "file",
+          method: "PUT",
+          data: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          responseHandler: (response) => {
+            return FileResponseSchema.parse(response.data);
           },
         };
       },
@@ -42,14 +46,14 @@ export const fileEndpoints = api.injectEndpoints({
     }),
     findFileByPath: builder.query<unknown, string>({
       query: (fileUrl) => ({
-        url: fileUrl,
+        url: `file/${encodeURIComponent(fileUrl)}`,
         method: "GET",
-        responseHandler: (response: unknown) => {
-          if (!(response instanceof Blob)) {
+        responseHandler: (response) => {
+          if (!(response.data instanceof Blob)) {
             throw new Error("Response is not a valid Blob");
           }
 
-          return response as Blob;
+          return response.data;
         },
         cache: "no-cache",
       }),

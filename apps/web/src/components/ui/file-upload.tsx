@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useRef, useState } from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import { motion } from "framer-motion";
 import { IconUpload } from "@tabler/icons-react";
 import { useDropzone } from "react-dropzone";
@@ -27,16 +27,30 @@ const secondaryVariant = {
 
 export const FileUpload = ({
   onChange,
+  resetFile
 }: {
   onChange?: (files: File[]) => void;
+  resetFile?: (resetCallback: () => void) => void;
 }) => {
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleReset = useCallback(() => {
+    setFiles([]);
+    if (onChange) {
+      onChange([]);
+    }
+  }, [onChange]);
+
+  useEffect(() => {
+    resetFile && resetFile(handleReset);
+  }, [resetFile, handleReset]);
+
   const handleFileChange = (newFiles: File[]) => {
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    setFiles((prevFiles) => newFiles);
     onChange && onChange(newFiles);
   };
+
 
   const handleClick = () => {
     fileInputRef.current?.click();

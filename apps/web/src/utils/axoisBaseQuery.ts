@@ -25,11 +25,21 @@ export const axiosBaseQuery =
       data?: AxiosRequestConfig["data"];
       params?: AxiosRequestConfig["params"];
       headers?: AxiosRequestConfig["headers"];
+      responseHandler?: (response: { data: unknown }) => Promise<unknown> | unknown;
+      responseType?: AxiosRequestConfig["responseType"];
     },
     unknown,
     AxiosBaseQueryError
   > =>
-  async ({ url, method, data, params, headers }) => {
+  async ({
+    url,
+    method,
+    data,
+    params,
+    headers,
+    responseHandler,
+    responseType,
+  }) => {
     try {
       const result = await axiosInstance({
         url,
@@ -37,9 +47,14 @@ export const axiosBaseQuery =
         data,
         params,
         headers,
+        responseType: responseType || "json",
       });
 
-      return { data: result };
+      const processedData = responseHandler
+        ? await responseHandler(result)
+        : result.data;
+
+      return { data: processedData };
     } catch (error: unknown) {
       const axoisError = error as AxiosError;
 
