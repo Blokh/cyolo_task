@@ -18,7 +18,6 @@ apps/api/src/domains/image-files/image-file.service.e2e.test.ts
 unfortunately the file is being fetched by the rendering had some issues,  ( the image preview )
 firstly i used stream in order to stream, it wasn't successful.
 
-
 Techonologies:
 1. TurboRepo (first time)
 2. redis 
@@ -46,6 +45,8 @@ as the project gone too big already, and i wanted to finish i tested only this f
 
 
 P.S I partially took the BaseQueueWorkerService from a different project of mine.
+And why is PUT is the method to upload file and not post?
+overall weird task... lol
 
 I wasted around 1.5 over this change:
 I went pretty much insane, why with body: the content length was 0.
