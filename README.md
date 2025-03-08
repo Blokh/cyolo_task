@@ -68,7 +68,7 @@ As the project grew quite large, I only tested the core functionality through th
 
 - I partially borrowed the BaseQueueWorkerService from another project of mine
 - Question: Why use PUT instead of POST for file uploads?
-- Unusual task requirements overall
+- Unusual task requirements overall ( as S3 signed URL would work here perfectly instead )
 
 ### Time Sinks
 
