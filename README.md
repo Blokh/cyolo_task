@@ -25,11 +25,14 @@ Techonologies:
 4. nestjs
 5. react + tanstack router (first time) + reduxjs toolkit - (wanted to use xstate/store. glad I didn't)
 6. biome (first time)
+7. Shadcn and tailwind
+
 
 Overall Notes over the proejct:
 Simplified version of the project
 I couldn've gone with the simple version but where's the fun with this?
-just use redis for the scheduling, use local memory/file/file+database(AlaSQL) like for records and extract, but decided to use postgres as it should be production and scale-wise properly set.
+just use redis for the scheduling/cron, use local memory/file/file+database(AlaSQL) like for records and extract, e.g. {[timeUtc]: record}, and check every second using cron, spawn a process, but decided to use postgres as it should be production and scale-wise properly set.
+Also, if the file is very large, we can miss by a second since the request, a way to handle it is to calculate delay from the request time and not from persist time.
 
 Unknowns/things i need to research -
 I installed all the packages in the root package.json like you would do in NX. and the turbo repo should inject them by the app's requirements.

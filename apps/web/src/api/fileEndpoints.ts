@@ -44,17 +44,11 @@ export const fileEndpoints = api.injectEndpoints({
       },
       invalidatesTags: ["FILES"],
     }),
-    findFileByPath: builder.query<unknown, string>({
+    findFileByPath: builder.query<Blob, string>({
       query: (fileUrl) => ({
         url: `file/${encodeURIComponent(fileUrl)}`,
         method: "GET",
-        responseHandler: (response) => {
-          if (!(response.data instanceof Blob)) {
-            throw new Error("Response is not a valid Blob");
-          }
-
-          return response.data;
-        },
+        responseType: 'blob',
         cache: "no-cache",
       }),
     }),
