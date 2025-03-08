@@ -1,70 +1,95 @@
 # Cyolo Task
-In order to run the app you need:
-1. pnpm install
-2. pnpm prepare
-3. pnpm dev
 
-you will have swagger at 
-http://localhost:3000/docs
-the queue system ( bull mq ):
-http://localhost:3000/api/queues
+## Getting Started
 
-react app at
-http://localhost:8080
+To run the application:
 
-you can run from the nest application the test which is at
+1. `pnpm install`
+2. `pnpm prepare`
+3. `pnpm dev`
+
+## Access Points
+
+- Swagger documentation: http://localhost:3000/docs
+- Queue system (Bull MQ): http://localhost:3000/api/queues
+- React application: http://localhost:8080
+
+## Testing
+
+You can run the end-to-end test from the Nest application:
+```
 apps/api/src/domains/image-files/image-file.service.e2e.test.ts
+```
 
-unfortunately the file is being fetched by the rendering had some issues,  ( the image preview )
-firstly i used stream in order to stream, it wasn't successful.
+Run the test with: `pnpm jest`
 
-Techonologies:
+## Known Issues
+
+The image preview has rendering issues. Initially attempted using stream but was unsuccessful.
+
+## Technologies Used
+
 1. TurboRepo (first time)
-2. redis 
-3. postgres
-4. nestjs
-5. react + tanstack router (first time) + reduxjs toolkit - (wanted to use xstate/store. glad I didn't)
-6. biome (first time)
-7. Shadcn and tailwind
+2. Redis
+3. PostgreSQL
+4. NestJS
+5. React + Tanstack Router (first time) + Redux Toolkit (considered xstate/store but glad I didn't)
+6. Biome (first time)
+7. Shadcn and Tailwind
 
+## Project Notes
 
-Overall Notes over the proejct:
-Simplified version of the project
-I couldn've gone with the simple version but where's the fun with this?
-just use redis for the scheduling/cron, use local memory/file/file+database(AlaSQL) like for records and extract, e.g. {[timeUtc]: record}, and check every second using cron, spawn a process, but decided to use postgres as it should be production and scale-wise properly set.
-Also, if the file is very large, we can miss by a second since the request, a way to handle it is to calculate delay from the request time and not from persist time.
+### Design Decisions
 
-Unknowns/things i need to research -
-I installed all the packages in the root package.json like you would do in NX. and the turbo repo should inject them by the app's requirements.
-not sure if it works this way or whether i should split it unto each package json and it's requirements.
+This is a simplified version of the project. I could have gone with an even simpler approach, but where's the fun in that?
 
-Additional logic -
-I don't understand why find by path, but I've added both functionalities, one with ID and one with path.
-I'll use path for this case but the id is ofc the proper way to do CRUD.
+Alternative approach would have been:
+- Use Redis for scheduling/cron
+- Use local memory/file/file+database(AlaSQL) for records
+- Extract using format like `{[timeUtc]: record}`
+- Check every second using cron
+- Spawn a process
 
+Instead, I chose PostgreSQL for better production scaling.
 
-to run the test run pnpm jest - the test file is only /Users/blokh/tasks/cyolo_task/apps/api/src/domains/image-files/image-file.service.e2e.test.ts
-as the project gone too big already, and i wanted to finish i tested only this functionality. everything else went through manual testing.
+For large files, we might miss timing by a second. To handle this, we could calculate delay from request time rather than persist time.
 
+### Unknowns/Research Needed
 
-P.S I partially took the BaseQueueWorkerService from a different project of mine.
-And why is PUT is the method to upload file and not post?
-overall weird task... lol
+I installed all packages in the root package.json (like in NX), expecting TurboRepo to inject them by each app's requirements. Not sure if this is the correct approach or if I should split requirements into individual package.json files.
 
-I wasted around 1.5 over this change:
-I went pretty much insane, why with body: the content length was 0.
-from: {
-url: "file",
-method: "PUT",
-body: formData,
-...
+### Additional Logic
 
-to: {
-url: "file",
-method: "PUT",
-data: formData,
-...
+I implemented both path and ID functionality for finding resources, although ID is the proper way for CRUD operations. Using path for this case.
 
-Wasted 1.5 more on loading chuncks in the response instead of just buffering the file.
+### Testing
 
-overall too tired to finish it.
+As the project grew quite large, I only tested the core functionality through the e2e test. Everything else was manually tested.
+
+### Notes
+
+- I partially borrowed the BaseQueueWorkerService from another project of mine
+- Question: Why use PUT instead of POST for file uploads?
+- Unusual task requirements overall
+
+### Time Sinks
+
+1. Wasted ~1.5 hours on this change:
+   From:
+   {
+     url: "file",
+     method: "PUT",
+     body: formData,
+     ...
+   }
+   
+   To:
+   {
+     url: "file",
+     method: "PUT",
+     data: formData,
+     ...
+   }
+
+2. Wasted another 1.5 hours on loading chunks in the response instead of just buffering the file.
+3. and another few hours over receiving the file via axois which requires the key of responseType: 'blob' because it serializes the response.
