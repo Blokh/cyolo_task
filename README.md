@@ -41,7 +41,7 @@ The image preview has rendering issues. Initially attempted using stream but was
 
 ### Design Decisions
 
-This is a simplified version of the project. I could have gone with an even simpler approach, but where's the fun in that?
+This is a simplified version of the project. I could have gone with an even simpler approach, **but where's the fun in that?**
 
 Alternative approach would have been:
 - Use Redis for scheduling/cron
