@@ -50,8 +50,6 @@ Alternative approach would have been:
 - Check every second using cron
 - Spawn a process
 
-Instead, I chose PostgreSQL for better production scaling.
-
 For large files, we might miss timing by a second. To handle this, we could calculate delay from request time rather than persist time.
 
 ### Unknowns/Research Needed
