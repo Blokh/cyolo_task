@@ -21,7 +21,7 @@ You can run the end-to-end test from the Nest application:
 apps/api/src/domains/image-files/image-file.service.e2e.test.ts
 ```
 
-Run the test with: `pnpm jest`
+Run the test with: `pnpm test:e2e`
 
 ## Known Issues
 
