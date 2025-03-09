@@ -27,7 +27,6 @@ Run the test with: `pnpm test:e2e`
 
 **I misunderstood the get file requirements, thought it requires transferring the local file URI**
 
-The image preview has rendering issues. Initially attempted using stream but was unsuccessful.
 
 ## Technologies Used
 
