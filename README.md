@@ -26,7 +26,7 @@ Run the test with: `pnpm test:e2e`
 ## Known Issues
 
 **I misunderstood the get file requirements, thought it requires transferring the local file URI**
-
+as described (file-url), I understood it's abnormal, but took it as part of the task.
 
 ## Technologies Used
 
