@@ -25,6 +25,7 @@ Run the test with: `pnpm test:e2e`
 
 ## Known Issues
 
+**I misunderstood the get file requirements, thought it requires transferring the local file URI**
 The image preview has rendering issues. Initially attempted using stream but was unsuccessful.
 
 ## Technologies Used
@@ -66,7 +67,7 @@ As the project grew quite large, I only tested the core functionality through th
 
 ### Notes
 
-- I partially borrowed the BaseQueueWorkerService from another project of mine
+- Disclaimer - I partially borrowed the BaseQueueWorkerService from another project of mine
 - Question: Why use PUT instead of POST for file uploads?
 - Unusual task requirements overall ( as S3 signed URL would work here perfectly instead )
 
